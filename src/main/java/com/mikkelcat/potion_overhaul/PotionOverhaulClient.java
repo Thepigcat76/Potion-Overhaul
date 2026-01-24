@@ -14,7 +14,7 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 @Mod(value = ExampleMod.MODID, dist = Dist.CLIENT)
 // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
 @EventBusSubscriber(modid = ExampleMod.MODID, value = Dist.CLIENT)
-public class ExampleModClient {
+public class PotionOverhaulClient {
     public ExampleModClient(ModContainer container) {
         // Allows NeoForge to create a config screen for this mod's configs.
         // The config screen is accessed by going to the Mods screen > clicking on your mod > clicking on config.
