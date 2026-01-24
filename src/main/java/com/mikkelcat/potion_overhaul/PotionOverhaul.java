@@ -1,5 +1,8 @@
 package com.mikkelcat.potion_overhaul;
 
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.*;
+import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -8,10 +11,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -67,6 +66,8 @@ public class PotionOverhaul {
     public PotionOverhaul(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
+        //Register potionsize changemthod to modevent bus.
+        modEventBus.addListener(this::modifymaxpotionstack);
 
         // Register the Deferred Register to the mod event bus so blocks get registered
         BLOCKS.register(modEventBus);
@@ -105,6 +106,24 @@ public class PotionOverhaul {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(EXAMPLE_BLOCK_ITEM);
         }
+    }
+
+    private void modifymaxpotionstack(ModifyDefaultComponentsEvent event)
+    {
+        event.modify(Items.POTION, builder ->
+        {
+            builder.set(DataComponents.MAX_STACK_SIZE, 8);
+        });
+
+        event.modify(Items.SPLASH_POTION, builder ->
+        {
+            builder.set(DataComponents.MAX_STACK_SIZE, 8);
+        });
+
+        event.modify(Items.LINGERING_POTION, builder ->
+        {
+            builder.set(DataComponents.MAX_STACK_SIZE, 8);
+        });
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
