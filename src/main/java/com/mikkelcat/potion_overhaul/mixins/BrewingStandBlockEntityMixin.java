@@ -39,7 +39,7 @@ public class BrewingStandBlockEntityMixin {
     @ModifyConstant(method = "serverTick", constant = @Constant(intValue = 20))
     private static int potionOverhaul$serverTickFuelAmount(int constant, @Local(ordinal = 0) ItemStack itemStack) {
         Integer data = itemStack.getItemHolder().getData(PotionOverhaul.BREWING_FUEL_MAP);
-        return (data != null) ? data : constant;
+        return (data != null) ?((BrewingStandBlockEntityMixin) (Object) blockEntity).fuel + data : ((BrewingStandBlockEntityMixin) (Object) blockEntity).fuel + constant;
     }
 
     @Definitions({
