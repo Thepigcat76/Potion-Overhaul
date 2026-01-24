@@ -1,8 +1,12 @@
 package com.mikkelcat.potion_overhaul;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
+import net.neoforged.neoforge.registries.datamaps.DataMapType;
+import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -42,6 +46,10 @@ public class PotionOverhaul {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
     // Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "examplemod" namespace
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
+
+    public static final DataMapType<Item, Integer> BREWING_FUEL_MAP = DataMapType.builder(rl("brewing_fuel"), Registries.ITEM, Codec.INT)
+            .synced(Codec.INT, false)
+            .build();
 
     // Creates a new Block with the id "examplemod:example_block", combining the namespace and path
     public static final DeferredBlock<Block> EXAMPLE_BLOCK = BLOCKS.registerSimpleBlock("example_block", BlockBehaviour.Properties.of().mapColor(MapColor.STONE));
@@ -84,6 +92,8 @@ public class PotionOverhaul {
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
 
+        modEventBus.addListener(this::registerDataMaps);
+
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, PotionOverhaulConfig.SPEC);
     }
@@ -124,6 +134,14 @@ public class PotionOverhaul {
         {
             builder.set(DataComponents.MAX_STACK_SIZE, 8);
         });
+    }
+
+    private void registerDataMaps(RegisterDataMapTypesEvent event) {
+        event.register(BREWING_FUEL_MAP);
+    }
+
+    public static ResourceLocation rl(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call

@@ -2,6 +2,7 @@ package com.mikkelcat.potion_overhaul.mixins;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mikkelcat.potion_overhaul.PotionOverhaul;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,7 +15,8 @@ public class BrewingStandFuelSlotMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;is(Lnet/minecraft/world/item/Item;)Z")
     )
     private static boolean potionOverhaul$mayPlaceItem(boolean original, @Local(argsOnly = true) ItemStack itemStack) {
-        return original || itemStack.is(Items.COAL);
+        Integer data = itemStack.getItemHolder().getData(PotionOverhaul.BREWING_FUEL_MAP);
+        return original || data != null;
     }
 
 }
