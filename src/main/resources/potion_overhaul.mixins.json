@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.mikkelcat.potion_overhaul.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "BrewingStandBlockEntityMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
