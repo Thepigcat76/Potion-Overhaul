@@ -1,4 +1,4 @@
-package com.example.examplemod;
+package com.mikkelcat.potion_overhaul;
 
 import java.util.List;
 import java.util.Set;
@@ -32,7 +32,7 @@ public class PotionOverhaulConfig {
     // a list of strings that are treated as resource locations for items
     public static final ModConfigSpec.ConfigValue<List<? extends String>> ITEM_STRINGS = BUILDER
             .comment("A list of items to log on common setup.")
-            .defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), () -> "", Config::validateItemName);
+            .defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), () -> "", PotionOverhaulConfig::validateItemName);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
