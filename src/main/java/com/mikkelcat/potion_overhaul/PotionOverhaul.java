@@ -1,6 +1,7 @@
 package com.mikkelcat.potion_overhaul;
 
 import com.mojang.serialization.Codec;
+import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigHelper;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
@@ -95,20 +96,10 @@ public class PotionOverhaul {
         modEventBus.addListener(this::registerDataMaps);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-        modContainer.registerConfig(ModConfig.Type.COMMON, PotionOverhaulConfig.SPEC);
+        PDLConfigHelper.registerConfig(PotionOverhaulConfig.class, ModConfig.Type.COMMON, modContainer);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        // Some common setup code
-        LOGGER.info("HELLO FROM COMMON SETUP");
-
-        if (PotionOverhaulConfig.LOG_DIRT_BLOCK.getAsBoolean()) {
-            LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
-        }
-
-        LOGGER.info("{}{}", PotionOverhaulConfig.MAGIC_NUMBER_INTRODUCTION.get(), PotionOverhaulConfig.MAGIC_NUMBER.getAsInt());
-
-        PotionOverhaulConfig.ITEM_STRINGS.get().forEach((item) -> LOGGER.info("ITEM >> {}", item));
     }
 
     // Add the example block item to the building blocks tab

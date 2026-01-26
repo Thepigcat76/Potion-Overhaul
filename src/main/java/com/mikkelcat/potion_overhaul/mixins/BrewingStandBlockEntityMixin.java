@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mikkelcat.potion_overhaul.PotionOverhaul;
+import com.mikkelcat.potion_overhaul.PotionOverhaulConfig;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
@@ -39,7 +40,8 @@ public class BrewingStandBlockEntityMixin {
     @ModifyConstant(method = "serverTick", constant = @Constant(intValue = 20))
     private static int potionOverhaul$serverTickFuelAmount(int constant, @Local(ordinal = 0) ItemStack itemStack, @Local(ordinal = 0) BrewingStandBlockEntity blockEntity) {
         Integer data = itemStack.getItemHolder().getData(PotionOverhaul.BREWING_FUEL_MAP);
-        return (data != null) ?((BrewingStandBlockEntityMixin) (Object) blockEntity).fuel + data : ((BrewingStandBlockEntityMixin) (Object) blockEntity).fuel + constant;
+        int fuel = ((BrewingStandBlockEntityMixin) (Object) blockEntity).fuel;
+        return (data != null) ? fuel + data : fuel + constant;
     }
 
     @Definitions({
@@ -50,7 +52,8 @@ public class BrewingStandBlockEntityMixin {
     @ModifyExpressionValue(method = "serverTick", at = @At("MIXINEXTRAS:EXPRESSION"))
     private static boolean potionOverhaul$serverTickFuelAmountComparison(boolean original, @Local(ordinal = 0) ItemStack itemStack, @Local(ordinal = 0) BrewingStandBlockEntity blockEntity) {
         Integer data = itemStack.getItemHolder().getData(PotionOverhaul.BREWING_FUEL_MAP);
-        return (itemStack.is(Items.BLAZE_POWDER) && original) || (data != null ? ((BrewingStandBlockEntityMixin) (Object) blockEntity).fuel + data <= 20 : original);
+        int fuel = ((BrewingStandBlockEntityMixin) (Object) blockEntity).fuel;
+        return (itemStack.is(Items.BLAZE_POWDER) && (fuel + 20 <= PotionOverhaulConfig.brewingStandFuelUses) || (data != null ? fuel + data <= PotionOverhaulConfig.brewingStandFuelUses : original));
     }
 
 }
