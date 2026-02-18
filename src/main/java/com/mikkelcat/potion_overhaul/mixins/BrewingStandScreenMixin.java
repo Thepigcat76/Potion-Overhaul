@@ -32,8 +32,12 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         int x = (this.width - this.imageWidth) / 2 + 60;
         int y = (this.height - this.imageHeight) / 2 + 44;
         if (mouseX > x && mouseX < x + 18 && mouseY > y && mouseY < y + 4) {
-            guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.literal("Fuel Uses: " + PotionOverhaulConfig.brewingStandFuelUses), mouseX, mouseY);
+            renderTooltips(guiGraphics, mouseX, mouseY);
         }
+    }
+
+    private static void renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.literal("Fuel Uses: " + PotionOverhaulConfig.brewingStandFuelUses), mouseX, mouseY);
     }
 
 }
