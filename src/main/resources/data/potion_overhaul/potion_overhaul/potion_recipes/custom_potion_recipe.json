@@ -1,0 +1,7 @@
+{
+  "from": "minecraft:awkward",
+  "to": "minecraft:water",
+  "ingredient": {
+    "item": "minecraft:stick"
+  }
+}

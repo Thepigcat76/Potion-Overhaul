@@ -6,10 +6,12 @@
     "BrewingStandBlockEntityMixin",
     "BrewingStandFuelSlotMixin",
     "PotionBrewingBuilderMixin",
-    "PotionBrewingMixin"
+    "PotionBrewingMixin",
+    "ReloadableServerResourcesMixin"
   ],
   "client": [
-    "BrewingStandScreenMixin"
+    "BrewingStandScreenMixin",
+    "ClientLevelMixin"
   ],
   "mixinextras": {
     "minVersion": "0.5.0-beta.1"

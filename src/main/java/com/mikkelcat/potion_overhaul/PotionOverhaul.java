@@ -1,11 +1,22 @@
 package com.mikkelcat.potion_overhaul;
 
+import com.mikkelcat.potion_overhaul.networking.UpdatePotionRecipesPayload;
+import com.mikkelcat.potion_overhaul.resources.PotionRecipe;
+import com.mikkelcat.potion_overhaul.resources.RegistryManagersGetter;
+import com.mikkelcat.potion_overhaul.utils.RegistryManagerHelper;
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigHelper;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.*;
 import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.registries.*;
 import net.neoforged.neoforge.registries.datamaps.DataMapType;
 import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
 import org.slf4j.Logger;
@@ -29,10 +40,9 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredItem;
-import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.HashMap;
+import java.util.List;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(PotionOverhaul.MODID)
@@ -89,11 +99,13 @@ public class PotionOverhaul {
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.addListener(this::onDatapacksSynced);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
-
+        modEventBus.addListener(this::registerDatapackRegistries);
         modEventBus.addListener(this::registerDataMaps);
+        modEventBus.addListener(this::registerPayloads);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         PDLConfigHelper.registerConfig(PotionOverhaulConfig.class, ModConfig.Type.COMMON, modContainer);
@@ -107,6 +119,29 @@ public class PotionOverhaul {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(EXAMPLE_BLOCK_ITEM);
         }
+    }
+
+    private void onDatapacksSynced(OnDatapackSyncEvent event) {
+        ServerPlayer player = event.getPlayer();
+        MinecraftServer server = event.getPlayerList().getServer();
+        List<ServerPlayer> relevantPlayers = event.getPlayer() == null ? event.getPlayerList().getPlayers() : List.of(event.getPlayer());
+
+        reloadPotionRecipes(player, relevantPlayers);
+
+    }
+
+    private static void reloadPotionRecipes(ServerPlayer player, List<ServerPlayer> relevantPlayers) {
+        if (player != null) {
+            updateReloadableRegistries(player);
+        } else {
+            for (ServerPlayer relevantPlayer : relevantPlayers) {
+                updateReloadableRegistries(relevantPlayer);
+            }
+        }
+    }
+
+    private static void updateReloadableRegistries(ServerPlayer p) {
+        PacketDistributor.sendToPlayer(p, new UpdatePotionRecipesPayload(new HashMap<>(RegistryManagerHelper.getPotionRecipesManager(p.level()).getByName())));
     }
 
     private void modifymaxpotionstack(ModifyDefaultComponentsEvent event)
@@ -125,6 +160,15 @@ public class PotionOverhaul {
         {
             builder.set(DataComponents.MAX_STACK_SIZE, 8);
         });
+    }
+
+    private void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
+        event.dataPackRegistry(PotionOverhaulRegistries.POTION_RECIPE_KEY, PotionRecipe.CODEC.codec(), PotionRecipe.CODEC.codec());
+    }
+
+    private void registerPayloads(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar(MODID);
+        registrar.playToClient(UpdatePotionRecipesPayload.TYPE, UpdatePotionRecipesPayload.STREAM_CODEC, UpdatePotionRecipesPayload::handle);
     }
 
     private void registerDataMaps(RegisterDataMapTypesEvent event) {
